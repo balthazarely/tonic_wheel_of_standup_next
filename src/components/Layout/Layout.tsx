@@ -12,7 +12,7 @@ const dimensions = {
 export const Layout = ({ children }: LayoutProps) => {
   return (
     <div
-      className="transition-all duration-200 bg-tonic-dark "
+      className="transition-all duration-200 bg-tonic-dark relative "
       style={dimensions}
     >
       {children}

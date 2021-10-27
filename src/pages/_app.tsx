@@ -4,11 +4,13 @@ import "../../styles/globals.scss";
 import SettingsContext from "../context/SettingsContext";
 import { Layout } from "../components/Layout/Layout";
 import { Navbar } from "../components/Navigation/Navbar";
+import { Drawer } from "../components/Navigation/Drawer";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <SettingsContext>
       <Layout>
+        <Drawer />
         <Navbar />
         <Component {...pageProps} />
       </Layout>

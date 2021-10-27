@@ -3,6 +3,7 @@ import { spinnerDimensions } from "./Spinner.styles";
 import { SpinnerBox } from "./SpinnerBox";
 import { SpinnerShadow } from "./SpinnerShadow";
 import { SpinnerTarget } from "./SpinnerTarget";
+import BeatLoader from "react-spinners/BeatLoader";
 
 interface SpinnerProps {
   staticNameArray: any[];

@@ -1,32 +1,49 @@
+import { useEffect, useState } from "react";
 import type { NextPage } from "next";
 import Head from "next/head";
 import { PageWrapper } from "../components/Layout/PageWrapper";
+import { Team } from "../components/Lineup/Team";
+import { CopyLink } from "../components/Lineup/CopyLink";
 import axios from "axios";
-import { useEffect, useState } from "react";
-import BeatLoader from "react-spinners/BeatLoader";
 import toast from "react-simple-toasts";
+import {
+  addAPerson,
+  deleteAPerson,
+  disableAPerson,
+  enableAPerson,
+  getAllPeople,
+} from "../api/People";
 
 const Lineup: NextPage = () => {
   const [people, setPeople] = useState<any[]>([]);
   const [changesMade, setChangesMade] = useState<boolean>(false);
-  const [sendingData, setSendingData] = useState<boolean>(false);
+  const [updateAll, setUpdateAll] = useState<boolean>(false);
+  const [showErrorMsg, setShowErrorMsg] = useState<boolean>(false);
+  const [newName, setNewName] = useState<string>("");
 
   async function getPeople() {
-    let response = await axios.get(
-      "https://wheelofstandup-api-dev.azurewebsites.net" + "/People"
-    );
+    let response = await getAllPeople();
     let people = await response.data.map((person: any) => person);
-    setPeople(people);
-    console.log(people);
+    await setPeople(people);
   }
 
   function addPeopleToEditArray(e: any, id: any) {
+    setUpdateAll(false);
     setChangesMade(true);
     let updatedList = people.map((item) => {
       if (item.id === id) {
-        return { ...item, isEnabled: e.target.checked }; //gets everything that was already in item, and updates "done"
+        return { ...item, isEnabled: e.target.checked };
       }
-      return item; // else return unmodified item
+      return item;
+    });
+    setPeople(updatedList);
+  }
+
+  function updateAllDb() {
+    setUpdateAll(!updateAll);
+    setChangesMade(true);
+    let updatedList = people.map((item) => {
+      return { ...item, isEnabled: true };
     });
     setPeople(updatedList);
   }
@@ -37,33 +54,35 @@ const Lineup: NextPage = () => {
     }
     people.forEach((person: any) => {
       if (person.isEnabled) {
-        axios.post(
-          `https://wheelofstandup-api-dev.azurewebsites.net/People/${person.id}/enable`
-        );
+        enableAPerson(person.id);
       }
       if (!person.isEnabled) {
-        axios.post(
-          `https://wheelofstandup-api-dev.azurewebsites.net/People/${person.id}/disable`
-        );
+        disableAPerson(person.id);
       }
     });
     setChangesMade(false);
+    setUpdateAll(false);
     toast("Lineup has been saved!");
   }
 
-  function AddNameToTeam(e: any) {
-    // Need posdt request
-    // Need valiadation
-    if (e.key === "Enter") {
-      let doesNameExist = people.some(
-        (item) => item.name === e.currentTarget.value
-      );
-      if (!doesNameExist) {
-        console.log("name doesn't exist! we should add it");
-      } else {
-        console.log("name is already in the array");
+  async function AddNameToTeam(e: any) {
+    let doesNameExist = people.some((item) => item.name === newName);
+    if (doesNameExist) {
+      setShowErrorMsg(true);
+    } else {
+      setShowErrorMsg(false);
+      if (e.key === "Enter") {
+        await addAPerson(newName);
+        setShowErrorMsg(false);
+        setNewName("");
+        getPeople();
       }
     }
+  }
+
+  async function deleteTeamMember(id: string) {
+    await deleteAPerson(id);
+    getPeople();
   }
 
   useEffect(() => {
@@ -92,54 +111,18 @@ const Lineup: NextPage = () => {
             </button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
-            <div>
-              <div className="text-xl mb-2 w-full border-b-2 border-gray-500">
-                Team
-              </div>
-              <div className="people__list ">
-                {people.map((person) => (
-                  <div
-                    className=" py-1 group flex items-center justify-between bg-transparent bg-opacity-20 hover:bg-opacity-20 hover:bg-gray-500 duration-200 transition"
-                    key={person.id}
-                  >
-                    <div>
-                      <input
-                        type="checkbox"
-                        checked={person.isEnabled}
-                        onChange={(e) => addPeopleToEditArray(e, person.id)}
-                        className="toggle mr-3 toggle-sm"
-                      />
-                      <span className="label-text text-base">
-                        {person.name}
-                      </span>
-                    </div>
-                    <div className="flex justify-between gap-2">
-                      <button className="opacity-0  duration-200 transition bg-transparent hover:bg-tonic-base group-hover:opacity-100 text-sm border-2 border-gray-500 px-4 ">
-                        Edit
-                      </button>
-                      <button className="opacity-0  duration-200 transition bg-transparent hover:bg-tonic-base group-hover:opacity-100 text-sm border-2 border-gray-500 px-4 ">
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                ))}
-                <div className="mt-0 w-full">
-                  <label className="label"></label>
-                  <input
-                    type="text"
-                    placeholder="Add new team member"
-                    className="input w-full"
-                    onKeyDown={(e) => AddNameToTeam(e)}
-                  />
-                </div>
-              </div>
-            </div>
-            <div>
-              <div className="text-xl mb-2 w-full border-b-2 border-gray-500">
-                Team
-              </div>
-              <div className="grid grid-cols-2 gap-4 ">Share Link</div>
-            </div>
+            <Team
+              updateAll={updateAll}
+              updateAllDb={updateAllDb}
+              people={people}
+              addPeopleToEditArray={addPeopleToEditArray}
+              deleteTeamMember={deleteTeamMember}
+              AddNameToTeam={AddNameToTeam}
+              setNewName={setNewName}
+              newName={newName}
+              showErrorMsg={showErrorMsg}
+            />
+            <CopyLink />
           </div>
         </PageWrapper>
       </div>

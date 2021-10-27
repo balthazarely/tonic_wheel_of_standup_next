@@ -5,12 +5,14 @@ interface NextButtonProps {
   nextButtonClick?: () => void;
   isSpinning: boolean;
   isGameActive: boolean;
+  gameOver: boolean;
 }
 
 export const SpinnerBtn = ({
   nextButtonClick,
   isSpinning,
   isGameActive,
+  gameOver,
 }: NextButtonProps) => {
   return (
     <div
@@ -22,7 +24,11 @@ export const SpinnerBtn = ({
           <BeatLoader color="white" loading={true} size={7} />
         </div>
       ) : (
-        <div className="  h-12 flex items-center ">WHO'S UP NEXT?</div>
+        <div className="  h-12 flex items-center ">
+          {!isGameActive && !gameOver && "START SPINNING!"}
+          {isGameActive && !gameOver && "WHO'S UP NEXT?"}
+          {isGameActive && gameOver && "THANKS FOR SPINNING"}
+        </div>
       )}
     </div>
   );
