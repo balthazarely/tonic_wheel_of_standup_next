@@ -66,11 +66,13 @@ const Lineup: NextPage = () => {
 
   async function addNewTeamMember(e: any) {
     let doesNameExist = people.some((item) => item.name === newName);
+
     if (doesNameExist) {
       setShowErrorMsg(true);
     } else {
       setShowErrorMsg(false);
       if (e.key === "Enter") {
+        await updateDb();
         await addAPerson(newName);
         setShowErrorMsg(false);
         setNewName("");

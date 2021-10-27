@@ -43,7 +43,7 @@ export const SpinnerWrapper = () => {
   async function spinWheel() {
     if (!gsap.isTweening(".box")) {
       let response = await axios.post(
-        "http://wheelofstandup-api-dev.azurewebsites.net" + "/Wheel/spin"
+        "https://wheelofstandup-api-dev.azurewebsites.net" + "/Wheel/spin"
       );
       setIsGameActive(true);
     }
