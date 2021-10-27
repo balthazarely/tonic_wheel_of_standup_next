@@ -1,5 +1,4 @@
 import type { NextPage } from "next";
-import Link from "next/link";
 import Head from "next/head";
 import { PageWrapper } from "../components/Layout/PageWrapper";
 import { SpinnerWrapper } from "../components/Spinner/SpinnerWrapper";

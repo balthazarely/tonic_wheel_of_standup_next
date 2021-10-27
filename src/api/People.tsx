@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const devAPIServer = "http://wheelofstandup-api-dev.azurewebsites.net";
+const devAPIServer = "https://wheelofstandup-api-dev.azurewebsites.net";
 
 export function getAllPeople() {
   return axios.get(devAPIServer + "/People");

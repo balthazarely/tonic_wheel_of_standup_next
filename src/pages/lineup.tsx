@@ -4,7 +4,6 @@ import Head from "next/head";
 import { PageWrapper } from "../components/Layout/PageWrapper";
 import { Team } from "../components/Lineup/Team";
 import { CopyLink } from "../components/Lineup/CopyLink";
-import axios from "axios";
 import toast from "react-simple-toasts";
 import {
   addAPerson,
@@ -65,7 +64,7 @@ const Lineup: NextPage = () => {
     toast("Lineup has been saved!");
   }
 
-  async function AddNameToTeam(e: any) {
+  async function addNewTeamMember(e: any) {
     let doesNameExist = people.some((item) => item.name === newName);
     if (doesNameExist) {
       setShowErrorMsg(true);
@@ -117,7 +116,7 @@ const Lineup: NextPage = () => {
               people={people}
               addPeopleToEditArray={addPeopleToEditArray}
               deleteTeamMember={deleteTeamMember}
-              AddNameToTeam={AddNameToTeam}
+              addNewTeamMember={addNewTeamMember}
               setNewName={setNewName}
               newName={newName}
               showErrorMsg={showErrorMsg}

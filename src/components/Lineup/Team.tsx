@@ -6,7 +6,7 @@ interface TeamlProps {
   people: any[];
   addPeopleToEditArray: (e: any, id: string) => void;
   deleteTeamMember: (id: string) => void;
-  AddNameToTeam: (e: any) => void;
+  addNewTeamMember: (e: any) => void;
   setNewName: (e: any) => void;
   newName: string;
   showErrorMsg: boolean;
@@ -18,7 +18,7 @@ export const Team = ({
   people,
   addPeopleToEditArray,
   deleteTeamMember,
-  AddNameToTeam,
+  addNewTeamMember,
   setNewName,
   newName,
   showErrorMsg,
@@ -68,7 +68,7 @@ export const Team = ({
             className={`input input-sm w-full ${
               showErrorMsg && " input-error"
             }`}
-            onKeyUp={(e) => AddNameToTeam(e)}
+            onKeyUp={(e) => addNewTeamMember(e)}
             onChange={(e) => setNewName(e.currentTarget.value)}
             // maxLength="15"
             value={newName}

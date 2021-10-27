@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const devAPIServer = "http://wheelofstandup-api-dev.azurewebsites.net/Wheel";
+const devAPIServer = "https://wheelofstandup-api-dev.azurewebsites.net/Wheel";
 
 export function spinWheel() {
   return axios.post(devAPIServer + "/spin");
