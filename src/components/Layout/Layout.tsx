@@ -6,13 +6,13 @@ interface LayoutProps {
 
 const dimensions = {
   minHeight: "700px",
-  height: "100vh",
+  // height: "100vh",
 };
 
 export const Layout = ({ children }: LayoutProps) => {
   return (
     <div
-      className=" bg-tonic-dark transition-all duration-200"
+      className="transition-all duration-200 bg-tonic-dark "
       style={dimensions}
     >
       {children}
