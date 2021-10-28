@@ -55,9 +55,9 @@ export const calcMultiplier = (arr: any[]) => {
 };
 
 export const duplicateArr = (arr: any[]) => {
-  // let times = calcMultiplier(arr);
+  let times = calcMultiplier(arr);
   // TODO: toggle this back
-  let times = 15;
+  // let times = 15;
   return Array(times)
     .fill([...arr])
     .reduce((a, b) => a.concat(b));

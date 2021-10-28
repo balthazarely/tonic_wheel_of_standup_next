@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import type { NextPage } from "next";
 import Head from "next/head";
 import { PageWrapper } from "../components/Layout/PageWrapper";
@@ -12,8 +12,12 @@ import {
   enableAPerson,
   getAllPeople,
 } from "../api/People";
+import { GlobalContext } from "../context/SettingsContext";
+import { WarningModal } from "../components/Modal/WarningModal";
 
 const Lineup: NextPage = () => {
+  const { modalOpen, openModal } = useContext(GlobalContext);
+  const [lineupInit, setLineupInit] = useState<boolean>(false);
   const [people, setPeople] = useState<any[]>([]);
   const [changesMade, setChangesMade] = useState<boolean>(false);
   const [updateAll, setUpdateAll] = useState<boolean>(false);
@@ -23,7 +27,8 @@ const Lineup: NextPage = () => {
   async function getPeople() {
     let response = await getAllPeople();
     let people = await response.data.map((person: any) => person);
-    await setPeople(people);
+    setPeople(people);
+    setLineupInit(true);
   }
 
   function addPeopleToEditArray(e: any, id: any) {
@@ -48,6 +53,14 @@ const Lineup: NextPage = () => {
   }
 
   function updateDb() {
+    let numberSelected = people.filter(
+      (person: any) => person.isEnabled === true
+    );
+
+    if (numberSelected.length < 2) {
+      openModal();
+      return;
+    }
     if (!changesMade) {
       return;
     }
@@ -113,6 +126,7 @@ const Lineup: NextPage = () => {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
             <Team
+              lineupInit={lineupInit}
               updateAll={updateAll}
               updateAllDb={updateAllDb}
               people={people}
@@ -126,6 +140,9 @@ const Lineup: NextPage = () => {
             <CopyLink />
           </div>
         </PageWrapper>
+        <div className={`modal ${modalOpen ? "modal-open" : ""}`}>
+          {modalOpen && <WarningModal />}
+        </div>
       </div>
     </div>
   );

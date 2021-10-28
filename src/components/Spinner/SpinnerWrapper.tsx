@@ -5,21 +5,22 @@ import { Spinner } from "./Spinner";
 import Pusher from "pusher-js";
 import { SpinnerBtn } from "./SpinnerBtn";
 import { SpinnerInfo } from "./SpinnerInfo";
-import { calculateSpinnerDistance } from "../Utilities/Utilities";
+import { calculateSpinnerDistance, duplicateArr } from "../Utilities/Utilities";
 import { spinnerWrapperDimensions } from "./Spinner.styles";
 import toast from "react-simple-toasts";
 import { getAllPeople } from "../../api/People";
+import ClipLoader from "react-spinners/ClipLoader";
 
 export const SpinnerWrapper = () => {
+  // non-state variables
+  let moveDistance: number | undefined;
   // Spinner, Etc. State
   const [rotations, setRotations] = useState<number>(7);
   const [duration, setDuration] = useState<number>(1);
   const [ease, setEase] = useState<string>("power4.inOut");
-
-  // non-state variables
-  let moveDistance: number | undefined;
-
   // Game States
+  const [pusherSubscribed, setPusherSubscribed] = useState<boolean>(false);
+
   const [staticNameArray, setStaticNameArray] = useState<string[]>([]);
   const [currentSelection, setCurrentSelection] = useState<string>("");
   const [newPersonSelected, setNewPersonSelected] = useState<any>();
@@ -33,23 +34,22 @@ export const SpinnerWrapper = () => {
     let people = await response.data
       .filter((person: any) => person.isEnabled)
       .map((person: any) => person.name);
-    //edge case here -> if length of user array is less than 11, we have to duplicate it
-    // let peopleMultiplied = duplicateArr(people);
-
-    setStaticNameArray(people);
+    let peopleMultiplied = duplicateArr(people);
+    setStaticNameArray(peopleMultiplied);
     setCurrentSelection(people[6]);
   }
 
   async function spinWheel() {
-    if (!gsap.isTweening(".box")) {
-      let response = await axios.post(
+    if (pusherSubscribed && !isSpinning && !gsap.isTweening(".box")) {
+      setIsSpinning(true);
+      await axios.post(
         "https://wheelofstandup-api-dev.azurewebsites.net" + "/Wheel/spin"
       );
       setIsGameActive(true);
     }
   }
 
-  async function calculateWheelAnimation() {
+  function calculateWheelAnimation() {
     moveDistance = calculateSpinnerDistance(
       currentSelection,
       newPersonSelected,
@@ -60,7 +60,6 @@ export const SpinnerWrapper = () => {
   }
 
   async function animateWheel() {
-    setIsSpinning(true);
     const tl = gsap.timeline();
     tl.to(".box", duration, {
       ease: ease,
@@ -96,9 +95,16 @@ export const SpinnerWrapper = () => {
       cluster: "us3",
     });
     const channel = pusher.subscribe("spin");
+
+    channel.bind("pusher:subscription_succeeded", () => {
+      console.log("sub is succeded");
+      setPusherSubscribed(true);
+    });
+
     channel.bind("person-selected", (data: any) => {
       let parsed = JSON.parse(data);
       setNewPersonSelected(parsed.SelectedPerson.Name);
+      console.log(parsed.SelectedPerson.Name);
       setPeopleWhoHaveGone(parsed.PeopleWhoHaveGone);
       // TODO need to get all the people who have gone on mount, not just when the spinner spins.
     });
@@ -120,21 +126,39 @@ export const SpinnerWrapper = () => {
   }, [staticNameArray]);
 
   return (
-    <div className="">
-      <div className=" md:flex-row flex-col flex gap-8 ">
-        <div className="flex-1 w-full h-full flex ">
-          <SpinnerBtn
-            nextButtonClick={spinWheel}
-            isGameActive={isGameActive}
-            isSpinning={isSpinning}
-            gameOver={gameOver}
+    <div className="flex md:flex-row flex-col gap-6 ">
+      <div className="flex-1 ">
+        <SpinnerBtn
+          nextButtonClick={spinWheel}
+          isGameActive={isGameActive}
+          isSpinning={isSpinning}
+          gameOver={gameOver}
+          pusherSubscribed={pusherSubscribed}
+        />
+        <div
+          className=" flex-1 w-full h-full flex flex-col items-center justify-center  overflow-hidden relative  "
+          style={spinnerWrapperDimensions}
+        >
+          <Spinner
+            staticNameArray={staticNameArray}
+            currentName={currentSelection!}
+            whoHasGoneArray={peopleWhoHaveGone}
           />
         </div>
-        <div className="flex-1 w-full h-full "> </div>
       </div>
-      <div className="flex-row flex gap-8  ">
+      <div className=" flex-1 ">
+        <SpinnerInfo
+          resetWheel={resetWheel}
+          gameOver={gameOver}
+          isSpinning={isSpinning}
+          currentName={currentSelection!}
+          isGameActive={isGameActive}
+          whoHasGoneArray={peopleWhoHaveGone}
+        />
+      </div>
+      {/* <div className="md:flex-row flex-col flex gap-8  ">
         <div
-          className=" flex-1 w-full h-full flex flex-col items-center justify-center  overflow-hidden relative "
+          className=" flex-1 w-full h-full flex flex-col items-center justify-center  overflow-hidden relative bord "
           style={spinnerWrapperDimensions}
         >
           <Spinner
@@ -151,7 +175,7 @@ export const SpinnerWrapper = () => {
           isGameActive={isGameActive}
           whoHasGoneArray={peopleWhoHaveGone}
         />
-      </div>
+      </div> */}
     </div>
   );
 };

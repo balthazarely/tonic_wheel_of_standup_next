@@ -47,9 +47,9 @@ export const Navbar = () => {
             onClick={openModal}
           />
 
-          <div className={`modal ${modalOpen ? "modal-open" : ""}`}>
+          {/* <div className={`modal ${modalOpen ? "modal-open" : ""}`}>
             {modalOpen && <Modal />}
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

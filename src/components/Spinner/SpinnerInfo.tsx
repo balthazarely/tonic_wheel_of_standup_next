@@ -1,12 +1,10 @@
 import React from "react";
-import { SpinnerBtn } from "./SpinnerBtn";
+import { infoWrapperDimensions } from "./Spinner.styles";
 
 interface InfoPannelProps {
   isSpinning: boolean;
-  // gameActive: boolean;
   currentName: string;
   whoHasGoneArray: string[];
-  // nameArray: string[];
   gameOver: boolean;
   resetWheel: () => void;
   isGameActive: boolean;
@@ -19,16 +17,17 @@ const borderStyle = {
 
 export const SpinnerInfo = ({
   isSpinning,
-  // gameActive,
   isGameActive,
   currentName,
   resetWheel,
   whoHasGoneArray,
-  // nameArray,
   gameOver,
 }: InfoPannelProps) => {
   return (
-    <div className="text-5xl flex-1 text-white font-extrabold  md:-mt-12 mt-12 ">
+    <div
+      className="text-5xl flex-1 text-white font-extrabold "
+      style={infoWrapperDimensions}
+    >
       <div className="">
         <div
           className="text-base flex justify-between font-light text-white mb-1 pl-1"
@@ -44,21 +43,7 @@ export const SpinnerInfo = ({
             </button>
           </div>
         </div>
-
-        <div className="">
-          {/* {whoHasGoneArray.map((name) => (
-            <div
-              key={name}
-              className={`text-base font-light py-0.5 px-2 flex items-center justify-between  ${
-                currentName === name && !gameOver
-                  ? "bg-tonic-base "
-                  : "text-white"
-              }`}
-            >
-              <div>{name}</div>
-              <div>{currentName === name && !gameOver ? "Up now" : ""}</div>
-            </div>
-          ))} */}
+        <div>
           {whoHasGoneArray.length !== 0 &&
             whoHasGoneArray.map((person: any, i: number) => (
               <div key={i} className="text-base font-light px-1 py-0.5">
